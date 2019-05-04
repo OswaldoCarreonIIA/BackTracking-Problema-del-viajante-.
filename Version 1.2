@@ -1,0 +1,96 @@
+int nodos = 5;
+int [][] mapa = { {0,1,1,1,0},
+                  {1,0,1,0,1},
+                  {1,1,0,1,1},
+                  {1,0,1,0,1},
+                  {0,1,1,1,0} };  //Matriz que repsesenta el mapa de las ciudades.
+                  
+int precio[][]= { {0,1,1,2,0},
+                  {3,0,1,0,5},
+                  {1,7,0,1,2},
+                  {2,0,3,0,1},
+                  {0,5,2,8,0} };  //El costo de ir de una ciudad a otra, tiene que tener sentido con mapa.
+int cont = 1;           
+int[] mejor = new int[nodos-1];
+
+void setup(){
+  int[] ruta = new int[nodos-1];
+  
+  for(int i=0;i<nodos-1;i++) ruta[i] = -1; 
+
+   Viajero(ruta,0);
+   imprimirRuta(mejor);
+}
+
+void Viajero(int[] ruta,int ciudad){
+  
+  if(ciudad>=nodos-1){
+    if(ultimaCiudad(ruta)){
+    print(cont++ +": ");imprimirRuta(ruta); 
+    if(Costo_Ruta(ruta) < Costo_Ruta(mejor)){
+      for(int i=0;i<nodos-1;i++)
+         mejor[i] = ruta[i];
+      }
+    }
+   return;
+  }
+  
+  
+  for(int i=1;i<nodos;i++){
+    if(Ruta_Valida(ruta,ciudad,i) == true){
+      ruta[ciudad] = i;
+      Viajero(ruta,ciudad+1);
+    }
+  }  
+  ruta[ciudad] = -1;
+ 
+}
+
+// FUNCIONES
+
+boolean Ruta_Valida(int[] ruta,int ciudad,int valor_asignado){
+  
+  if(ciudad==0){
+    if(mapa[0][valor_asignado]==0) return false;
+  }
+  
+  else if(mapa[ruta[ciudad-1]][valor_asignado]==0) return false;
+  
+  int aux = ruta[ciudad];
+  ruta[ciudad] =valor_asignado;
+  for(int k=0;k<ciudad;k++){
+    if(ruta[ciudad] == ruta[k]) {
+      ruta[ciudad] = aux;
+      return false;
+    }
+  }
+  ruta[ciudad] = aux;
+    
+  return true;
+}
+
+//Realizar la función para verificar si el último nodo tiene conexión con el nodo 0.
+
+int Costo_Ruta(int[] ruta){
+    if(ruta[0] == 0) return 10000;
+    
+    int costo = precio[0][ruta[0]];
+    for(int i=1;i<nodos-1;i++)  costo = costo + precio[ruta[i-1]][ruta[i]];
+    
+    costo = costo + precio[ruta[ruta.length-1]][0];
+  return costo;
+    
+}
+  
+void imprimirRuta(int[] ruta){
+  println("Ruta:"); for(int i:ruta){
+                        print(i+" "); 
+                     }
+  println(); println("Costo");
+  println(Costo_Ruta(ruta));
+}
+
+boolean ultimaCiudad(int[] ruta){
+ if(mapa[ruta[ruta.length-1]][0] == 0) return false; 
+ return true;
+}
